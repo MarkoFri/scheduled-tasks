@@ -34,7 +34,7 @@ def send_letters(daily_list):
         my_email = os.environ.get("MY_EMAIL")
         with smtplib.SMTP('smtp.gmail.com', 587) as connection:
             connection.starttls()
-            connection.login(user=my_email, password=os.environ.get("MY_PASSWORD")
+            connection.login(user=my_email, password=os.environ.get("MY_PASSWORD"))
             connection.sendmail(from_addr=my_email,
                                 to_addrs=to_address,
                                 msg=f"subject: Happy Birthday, {name}\n\n {data}")
