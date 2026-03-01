@@ -10,6 +10,7 @@ import pandas as pd
 import datetime as dt
 import random as rd
 import smtplib
+import os
 
 dataframe = pd.read_csv('birthdays.csv')
 birthday_list = dataframe.to_dict(orient="records")
@@ -30,10 +31,10 @@ def send_letters(daily_list):
             data = file.read()
             data = data.replace("[NAME]", name)
         print (data)
-        my_email = "marko.friedrich.alt@gmail.com"
+        my_email = os.environ.get("MY_EMAIL)
         with smtplib.SMTP('smtp.gmail.com', 587) as connection:
             connection.starttls()
-            connection.login(user=my_email, password="ppqz mkst wbxf kvgc")
+            connection.login(user=my_email, password=os.environ.get(MY_PASSWORD)
             connection.sendmail(from_addr=my_email,
                                 to_addrs=to_address,
                                 msg=f"subject: Happy Birthday, {name}\n\n {data}")
