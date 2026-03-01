@@ -6,33 +6,36 @@
 # See the solution video in the 100 Days of Python Course for explainations.
 
 
-from datetime import datetime
-import pandas
-import random
+import pandas as pd
+import datetime as dt
+import random as rd
 import smtplib
-import os
 
-# import os and use it to get the Github repository secrets
-MY_EMAIL = os.environ.get("MY_EMAIL")
-MY_PASSWORD = os.environ.get("MY_PASSWORD")
+dataframe = pd.read_csv('birthdays.csv')
+birthday_list = dataframe.to_dict(orient="records")
 
-today = datetime.now()
-today_tuple = (today.month, today.day)
+def check_today(date):
+    today = dt.datetime.today()
+    return today.month == date.month and today.day == date.day
 
-data = pandas.read_csv("birthdays.csv")
-birthdays_dict = {(data_row["month"], data_row["day"])                  : data_row for (index, data_row) in data.iterrows()}
-if today_tuple in birthdays_dict:
-    birthday_person = birthdays_dict[today_tuple]
-    file_path = f"letter_templates/letter_{random.randint(1, 3)}.txt"
-    with open(file_path) as letter_file:
-        contents = letter_file.read()
-        contents = contents.replace("[NAME]", birthday_person["name"])
+def create_daily_birthday_list():
+    daily_birthday_list = [entry for entry in birthday_list if check_today(dt.date(entry["year"], entry["month"], entry["day"])) ]
+    return daily_birthday_list
 
-    with smtplib.SMTP("YOUR EMAIL PROVIDER SMTP SERVER ADDRESS") as connection:
-        connection.starttls()
-        connection.login(MY_EMAIL, MY_PASSWORD)
-        connection.sendmail(
-            from_addr=MY_EMAIL,
-            to_addrs=birthday_person["email"],
-            msg=f"Subject:Happy Birthday!\n\n{contents}"
-        )
+def send_letters(daily_list):
+    for person in daily_list:
+        name = person["name"]
+        to_address = person["email"]
+        with open(f'letter_templates/letter_{rd.randint(1, 3)}.txt', "r") as file:
+            data = file.read()
+            data = data.replace("[NAME]", name)
+        print (data)
+        my_email = "marko.friedrich.alt@gmail.com"
+        with smtplib.SMTP('smtp.gmail.com', 587) as connection:
+            connection.starttls()
+            connection.login(user=my_email, password="ppqz mkst wbxf kvgc")
+            connection.sendmail(from_addr=my_email,
+                                to_addrs=to_address,
+                                msg=f"subject: Happy Birthday, {name}\n\n {data}")
+
+send_letters(create_daily_birthday_list())
